@@ -1,49 +1,32 @@
 import { db } from '../db/connectFirebase.js';
 import createHttpError from 'http-errors';
+import { applyFilter, paginate } from '../utils/psychologistFilters.js';
+
+const PER_PAGE = 3;
 
 export async function getAllPsychologists(req, res) {
   const page = Math.max(Number(req.query.page) || 1, 1);
-  const perPage = 3;
-  const filter = req.query.filter || 'show_all';
-
+  const filter = req.query.filter;
   const snapshot = await db.ref('psychologists').get();
 
-  let all = Object.entries(snapshot.val() ?? {})
+  const all = Object.entries(snapshot.val() ?? {})
     .filter(([, value]) => value)
     .map(([id, value]) => ({ id, ...value }));
 
-  switch (filter) {
-    case 'a_to_z':
-      all.sort((a, b) => a.name.localeCompare(b.name));
-      break;
-    case 'z_to_a':
-      all.sort((a, b) => b.name.localeCompare(a.name));
-      break;
-    case 'less_than_10':
-      all = all.filter((p) => p.price_per_hour < 10);
-      break;
-    case 'greater_than_10':
-      all = all.filter((p) => p.price_per_hour >= 10);
-      break;
-    case 'popular':
-      all.sort((a, b) => b.rating - a.rating);
-      break;
-    case 'not_popular':
-      all.sort((a, b) => a.rating - b.rating);
-      break;
-    case 'show_all':
-    default:
-      break;
-  }
+  const favorites = req.user?.favorites ?? {};
 
-  const totalItems = all.length;
-  const start = (page - 1) * perPage;
-  const totalPages = Math.ceil(totalItems / perPage);
-  const psychologists = all.slice(start, start + perPage);
+  const { items, ...pagination } = paginate(
+    applyFilter(all, filter),
+    page,
+    PER_PAGE,
+  );
 
-  res
-    .status(200)
-    .json({ page, perPage, totalItems, totalPages, psychologists });
+  const data = items.map((p) => ({
+    ...p,
+    isFavorite: Boolean(favorites[p.id]),
+  }));
+
+  res.status(200).json({ status: 200, data, pagination });
 }
 
 export async function getPsychologistsById(req, res) {
@@ -54,5 +37,11 @@ export async function getPsychologistsById(req, res) {
     throw createHttpError(404, 'Psychologist not found');
   }
 
-  res.status(200).json({ id, ...snapshot.val() });
+  const psychologist = { id: snapshot.key, ...snapshot.val() };
+  const favorites = req.user?.favorites ?? {};
+
+  res.status(200).json({
+    status: 200,
+    data: { ...psychologist, isFavorite: Boolean(favorites[psychologist.id]) },
+  });
 }
