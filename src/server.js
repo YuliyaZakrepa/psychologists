@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes.js';
 import psychologistRoutes from './routes/psychologistsRoutes.js';
 import favoritesRouter from './routes/favoritesRouter.js';
 import appointmentsRouter from './routes/appointmentsRouter.js';
+import usersRouter from './routes/usersRouter.js';
 import { errors } from 'celebrate';
 import cookieParser from 'cookie-parser';
 
@@ -21,6 +22,7 @@ app.use(cookieParser());
 
 app.use(authRoutes);
 app.use(psychologistRoutes);
+app.use(usersRouter);
 app.use(favoritesRouter);
 app.use(appointmentsRouter);
 
