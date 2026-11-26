@@ -3,8 +3,8 @@ const FILTERS = [
   'show_all',
   'a_to_z',
   'z_to_a',
-  'less_than_10',
-  'greater_than_10',
+  'less_than_100',
+  'greater_than_100',
   'popular',
   'not_popular',
 ];
