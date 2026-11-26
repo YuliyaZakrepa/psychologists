@@ -1,4 +1,4 @@
-const PRICE_LIMIT = 10;
+const PRICE_LIMIT = 100;
 
 const FILTERS = {
   a_to_z: { sort: (a, b) => a.name.localeCompare(b.name) },
