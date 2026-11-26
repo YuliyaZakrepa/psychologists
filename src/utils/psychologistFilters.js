@@ -3,8 +3,8 @@ const PRICE_LIMIT = 100;
 const FILTERS = {
   a_to_z: { sort: (a, b) => a.name.localeCompare(b.name) },
   z_to_a: { sort: (a, b) => b.name.localeCompare(a.name) },
-  less_than_10: { filter: (p) => p.price_per_hour < PRICE_LIMIT },
-  greater_than_10: { filter: (p) => p.price_per_hour >= PRICE_LIMIT },
+  less_than_100: { filter: (p) => p.price_per_hour < PRICE_LIMIT },
+  greater_than_100: { filter: (p) => p.price_per_hour >= PRICE_LIMIT },
   popular: { sort: (a, b) => b.rating - a.rating },
   not_popular: { sort: (a, b) => a.rating - b.rating },
   show_all: {},
